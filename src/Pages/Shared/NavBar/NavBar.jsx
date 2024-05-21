@@ -1,9 +1,14 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../../Provider/AuthProvider";
+import { FaShoppingCart  } from 'react-icons/fa';
+import useCart from "../../../Hooks/useCart";
 
 const NavBar = () => {
     const { user, logOut } = useContext(AuthContext)
+    const [carts] = useCart()
+
+
     const navBar = <>
         <li><Link to='/'>Home</Link></li>
         <li><Link to='/menu'>Menu</Link></li>
@@ -12,12 +17,12 @@ const NavBar = () => {
 
     const handleLogOut = () => {
         logOut()
-        .then(()=>{
+            .then(() => {
 
-        })
-        .catch(error=>{
-            console.error(error);
-        })
+            })
+            .catch(error => {
+                console.error(error);
+            })
     }
     return (
         <div className="navbar fixed z-10 bg-opacity-30 max-w-screen-xl bg-black text-white">
@@ -39,12 +44,18 @@ const NavBar = () => {
             </div>
             <div className="navbar-end">
                 {
-                    user? <>
-                    <span>{user?.displayName}</span>
-                    <Link to='/login'><button onClick={handleLogOut} className="btn btn-ghost">Log Out</button></Link> 
+                    user ? <>
+                        {/* <span>{user?.displayName}</span> */}
+                        <Link to='/dashboard/cart'>
+                            <button className=" bg-transparent text-white outline-none border-none flex gap-3 items-center">
+                                <FaShoppingCart className="text-2xl "></FaShoppingCart>
+                                <div className="bg-gray-700 rounded-full text-white -700 -ml-[20px] -mt-[20px] p-[2px] text-sm px-2">{carts.length}</div>
+                            </button>
+                        </Link>
+                        <Link to='/login'><button onClick={handleLogOut} className="btn btn-ghost">Log Out</button></Link>
                     </>
-                    : 
-                    <Link to='/login'><button className="btn btn-ghost">Login</button></Link>
+                        :
+                        <Link to='/login'><button className="btn btn-ghost">Login</button></Link>
 
 
                 }
