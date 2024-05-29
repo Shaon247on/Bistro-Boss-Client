@@ -5,10 +5,13 @@ import { useForm } from "react-hook-form"
 import { AuthContext } from "../../Provider/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import SocialLogin from "../../Components/SocialLogin/SocialLogin";
 const SignUp = () => {
-    const {signUp, updateUserProfile} = useContext(AuthContext)
+    const { signUp, updateUserProfile } = useContext(AuthContext)
     const navigate = useNavigate()
-    
+    const axiosPublic = useAxiosPublic()
+
     const {
         register,
         handleSubmit,
@@ -19,25 +22,35 @@ const SignUp = () => {
     const onSubmit = (data) => {
         console.log(data)
         signUp(data.email, data.password)
-        .then(result=>{
-            const user = result.user
-            console.log(user)
-            updateUserProfile(data.name, data.photoURL)
-            .then(()=>{
-                console.log('User info Updated');
-                reset()
-                Swal.fire({
-                    position: "top-end",
-                    icon: "success",
-                    title: "Successfully Signed Up",
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                  navigate('/')
-            }).catch(error=>{
-                console.error(error);
-            })
-        }). catch(error=>console.error(error))
+            .then(result => {
+                const user = result.user
+                console.log(user)
+                updateUserProfile(data.name, data.photoURL)
+                    .then(() => {
+                        const usersInfo = {
+                            name: data.name,
+                            email: data.email
+                        }
+                        axiosPublic.post('/users', usersInfo)
+                            .then(res => {
+                                if (res.data.insertedId) {
+                                    console.log('user added to the data base');
+                                    reset()
+                                    Swal.fire({
+                                        position: "top-end",
+                                        icon: "success",
+                                        title: "Successfully Signed Up",
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    });
+                                    navigate('/')
+                                }
+                            })
+
+                    }).catch(error => {
+                        console.error(error);
+                    })
+            }).catch(error => console.error(error))
     }
 
     return (
@@ -78,12 +91,12 @@ const SignUp = () => {
                             <label className="label">
                                 <span className="label-text">Password</span>
                             </label>
-                            <input name="password" {...register("password", { 
-                                required: true, 
-                                maxLength: 20, 
-                                minLength: 8, 
-                                pattern:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d{1,}).+$/
-                                })} type="password" placeholder="password" className="input input-bordered" />
+                            <input name="password" {...register("password", {
+                                required: true,
+                                maxLength: 20,
+                                minLength: 8,
+                                pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d{1,}).+$/
+                            })} type="password" placeholder="password" className="input input-bordered" />
                             {errors.password?.type === "minLength" && (
                                 <p className="text-red-600">Password should be more then 8 letter</p>
                             )}
@@ -101,12 +114,15 @@ const SignUp = () => {
                             </label>
                         </div>
                         <div className="form-control mt-6">
-                            <input type="submit" className="btn btn-primary" value='Sign Up'/>
+                            <input type="submit" className="btn btn-primary" value='Sign Up' />
                         </div>
                     </form>
+                    <SocialLogin></SocialLogin>
+
                     <div className='m-9'>
                         <p><small>Already have an account?<Link className='text-blue-500 hover:underline' to='/login'>Login</Link></small></p>
                     </div>
+
                 </div>
             </div>
         </div>

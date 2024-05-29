@@ -2,11 +2,12 @@ import Swal from "sweetalert2";
 import useAxios from "../../../Hooks/useAxios";
 import useCart from "../../../Hooks/useCart";
 import { FaTrash } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Cart = () => {
     const [cart, refetch] = useCart()
     const axios = useAxios()
-    
+
     const totalPrice = cart.reduce((acc, item) => {
         const total = acc + item.price
         return total
@@ -23,12 +24,12 @@ const Cart = () => {
             confirmButtonText: "Yes, delete it!"
         }).then((result) => {
             if (result.isConfirmed) {
-                const deleteItem = async()=>{
+                const deleteItem = async () => {
                     const { data } = await axios.delete(`/carts/${e}`)
                     console.log(data)
                     refetch()
-                }       
-                deleteItem()         
+                }
+                deleteItem()
                 Swal.fire({
                     title: "Deleted!",
                     text: "Your item has been deleted.",
@@ -44,7 +45,12 @@ const Cart = () => {
             <div className="flex items-center gap-8 justify-around">
                 <h1 className="text-4xl font-bold">Items: {cart.length}</h1>
                 <h1 className="text-4xl font-bold">Total Price: ${totalPrice}</h1>
-                <button className="btn btn-primary">Pay</button>
+                {cart.length? <Link to='/dashboard/payment'>
+                    <button className="btn btn-primary">Pay</button>
+                </Link>:
+                <button disabled className="btn btn-primary">Pay</button>
+
+                }
             </div>
             <div className="text-center">
                 <div className="container p-2 mx-auto sm:p-4 dark:text-gray-800">
