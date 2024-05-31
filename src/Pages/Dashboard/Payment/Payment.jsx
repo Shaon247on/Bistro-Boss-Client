@@ -5,7 +5,7 @@ import CheckOut from "./CheckOut";
 
 
 //TODO: add publishable key
-const stripePromise = loadStripe()
+const stripePromise = loadStripe(import.meta.env.VITE_GETWAY_PK)
 
 const Payment = () => {
     return (
@@ -14,7 +14,7 @@ const Payment = () => {
                 heading='Payment'
                 subHeading='Select Your Method'
             ></SectionTitle>
-            <div>
+            <div className="mx-10">
                 <Elements stripe={stripePromise}>
                     <CheckOut></CheckOut>
                 </Elements>
